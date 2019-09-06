@@ -24,7 +24,7 @@ Where n is the port number - to find out the port number (optional), run `midilo
 ### e.g.
 * `$ midilog` by itself will just list the ports. 
 * `$ midilog 4` will open the 4th port, and 
-* `$midilog 3 1` will open the third port, and print out everything including sysex, timing + active sensing.
+* `$ midilog 3 1` will open the third port, and print out everything including sysex, timing + active sensing.
 
 
 Output looks like this for listing inputs: 
