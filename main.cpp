@@ -3,34 +3,9 @@
 #include <stdio.h>
 #include <memory>
 #include <unistd.h>
-
 using namespace std;
 
-bool showExtras = false;
 
-void printMidiDevices() {
-	// RtMidiIn constructor
-	shared_ptr<RtMidiIn> midiIn;
-	try {
-		midiIn = std::make_shared<RtMidiIn>();
-	}catch ( RtMidiError &error ) {
-		error.printMessage();
-		exit( EXIT_FAILURE );
-	}
-
-	// Check inputs.
-	uint32_t nPorts = midiIn->getPortCount();
-	printf("There are %u MIDI inputs.\n", nPorts);
-	std::string portName;
-	for ( unsigned int i=0; i<nPorts; i++ ) {
-		try {
-			portName = midiIn->getPortName(i);
-		} catch ( RtMidiError &error ) {
-			error.printMessage();
-		}
-		printf("[%u]: %s\n", i, portName.c_str());
-	}
-}
 
 
 
@@ -41,7 +16,6 @@ void printMidiDevices() {
 #define MIDI_PITCH_BEND          0xE0
 #define MIDI_AFTERTOUCH          0xD0
 #define MIDI_POLY_AFTERTOUCH     0xA0
-
 
 #define MIDI_SYSEX               0xF0
 #define MIDI_TIME_CODE           0xF1
@@ -84,6 +58,67 @@ string getStatusString(int status) {
 
 
 
+bool showExtras = false;
+
+void printMidiDevices() {
+	// RtMidiIn constructor
+	shared_ptr<RtMidiIn> midiIn;
+	try {
+		midiIn = std::make_shared<RtMidiIn>();
+	}catch ( RtMidiError &error ) {
+		error.printMessage();
+		exit( EXIT_FAILURE );
+	}
+
+	// Check inputs.
+	uint32_t nPorts = midiIn->getPortCount();
+	printf("There are %u MIDI inputs.\n", nPorts);
+	for ( unsigned int i=0; i<nPorts; i++ ) {
+		try {
+			auto portName = midiIn->getPortName(i);
+			printf("[%u]: %s\n", i, portName.c_str());
+		} catch ( RtMidiError &error ) {
+			error.printMessage();
+		}
+	}
+}
+
+
+void printExtras(const vector<uint8_t> &msg, uint8_t status, uint8_t channel) {
+
+
+	if(status<MIDI_SYSEX) {
+		printf("ch: %u   ", channel);
+	}
+	switch(status) {
+		case MIDI_NOTE_ON:
+		case MIDI_NOTE_OFF:
+			printf("note: %u   vol: %u", msg[1], msg[2]);
+			break;
+		case MIDI_CONTROL_CHANGE:
+			printf("ctrl: %u   val: %u", msg[1], msg[2]);
+			break;
+
+		case MIDI_PROGRAM_CHANGE:
+			printf("program: %u", msg[1]);
+			break;
+
+		case MIDI_PITCH_BEND: {
+			int16_t bend =  (int) (msg[2] << 7) + (int) msg[1];
+			printf("bend: %d", bend);
+		}
+		break;
+
+		case MIDI_AFTERTOUCH:
+			printf("pressure: %u", msg[1]);
+			break;
+
+		case MIDI_POLY_AFTERTOUCH:
+			printf("note: %u  pressure: %u", msg[1], msg[2]);
+			break;
+	}
+}
+
 void runMidiLog(int inPort) {
 	auto midiIn = std::make_shared<RtMidiIn>();
 	midiIn->openPort(inPort);
@@ -112,6 +147,7 @@ void runMidiLog(int inPort) {
 
 				printf("0x%02x\t", message[i]);
 			}
+			printExtras(message, status, channel);
 			printf("\n");
 		}
 
@@ -128,8 +164,6 @@ void printUsage(char *c) {
 		"the 0 or 1 is optional and turns off or on exta messages\n"
 		"like sysex/timing/active sensing.", c, c);
 }
-
-
 
 int main(int argc, char **argv) {
 	if(argc==1) {
