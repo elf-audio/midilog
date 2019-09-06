@@ -21,10 +21,10 @@ $ midilog [n] [0|1]
 Where n is the port number - to find out the port number (optional), run `midilog` with no arguments to list and enumerate all ports. The 0 or 1 at the end is optional and turns off or on exta messages like sysex/timing/active sensing.
 
 
-eg. typing,
-`$ midilog` by itself will just list the ports. 
-`$ midilog 4` will open the 4th port, and 
-`$midilog 3 1` will open the third port, and print out everything including sysex, timing + active sensing.
+### e.g.
+* `$ midilog` by itself will just list the ports. 
+* `$ midilog 4` will open the 4th port, and 
+* `$midilog 3 1` will open the third port, and print out everything including sysex, timing + active sensing.
 
 
 Output looks like this for listing inputs: 
