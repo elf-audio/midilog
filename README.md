@@ -1,7 +1,16 @@
 # midilog
-Command line utility that runs on the mac that lists available midi ports and prints out midi messages as they are received.
+Command line utility that runs on the mac that lists available midi ports and prints out midi messages as they are received. It's mostly copy/pasted from the excellent RtMidi tutorial, with a little help also from [ofxMidi](https://github.com/danomatika/ofxMidi)
 
-To compile, download, cd to directory, git submodule init, git submodule update, then type make to build. It's mostly copy/pasted from the excellent RtMidi tutorial.
+To compile, download or clone the repo then,
+```
+$ cd to/midilog/dir
+$ git submodule init
+$ git submodule update
+$ make
+```
+
+The executable will appear in same dir called midilog. 
+
 
 ## Usage
 
@@ -10,6 +19,13 @@ $ midilog [n] [0|1]
 ```
 
 Where n is the port number - to find out the port number (optional), run `midilog` with no arguments to list and enumerate all ports. The 0 or 1 at the end is optional and turns off or on exta messages like sysex/timing/active sensing.
+
+
+eg. typing,
+`$ midilog` by itself will just list the ports. 
+`$ midilog 4` will open the 4th port, and 
+`$midilog 3 1` will open the third port, and print out everything including sysex, timing + active sensing.
+
 
 Output looks like this for listing inputs: 
 
